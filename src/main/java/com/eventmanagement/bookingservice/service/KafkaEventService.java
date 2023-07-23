@@ -31,10 +31,4 @@ public class KafkaEventService {
         eventService.deleteEvent(eventId, true);
     }
 
-    @KafkaListener(topics = "event-changed-kafka-events")
-    private void consumeEventChanged(EventChanged eventChanged) {
-        Event event = kafkaEventMapper.toEvent(eventChanged);
-        eventService.updateEvent(event);
-    }
-
 }

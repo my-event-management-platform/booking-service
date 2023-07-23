@@ -33,9 +33,4 @@ public class EventService {
         eventRepository.deleteById(eventId);
     }
 
-    @Transactional
-    public void updateEvent(Event event) {
-        getEvent(event.getId()); // Checking existence of Event to be changed
-        eventRepository.save(event);
-    }
 }
