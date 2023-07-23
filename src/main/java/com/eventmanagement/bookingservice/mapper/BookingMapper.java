@@ -29,7 +29,7 @@ public abstract class BookingMapper {
     @BeforeMapping
     protected void enrichBooking(BookingDTO bookingDTO, @MappingTarget Booking booking) {
         booking.setUserId("devUserId"); // Temporary ID. Will be extracted from Security Context later
-        Event event = eventService.getEvent(booking.getId());
+        Event event = eventService.getEvent(bookingDTO.getEventId());
         booking.setEvent(event);
     }
 }
