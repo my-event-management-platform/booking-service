@@ -15,8 +15,4 @@ public abstract class KafkaEventMapper {
     @Mapping(target = "capacityLeft", source = "capacity")
     @Mapping(target = "initialCapacity", source = "capacity")
     public abstract Event toEvent(EventPublished eventPublished);
-
-    @Mapping(target = "capacityLeft", source = "capacity")
-    @Mapping(target = "initialCapacity", source = "capacity")
-    public abstract Event toEvent(EventChanged eventChanged);
 }
