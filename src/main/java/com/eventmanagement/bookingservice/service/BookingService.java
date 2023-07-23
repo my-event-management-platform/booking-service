@@ -16,9 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BookingService {
     public final BookingRepository bookingRepository;
+    public final EventService eventService;
 
     @Transactional
     public void addBooking(Booking booking) {
+        eventService.changeEventCapacityLeft(booking.getEvent().getId(), -booking.getPersons());
         bookingRepository.insert(booking);
     }
 
@@ -32,10 +34,9 @@ public class BookingService {
 
 
     @Transactional
-    public void deleteBooking(String bookingId, boolean checkExistence) {
-        if (checkExistence) {
-            getBooking(bookingId);
-        }
+    public void deleteBooking(String bookingId) {
+        Booking booking = getBooking(bookingId);
+        eventService.changeEventCapacityLeft(booking.getEvent().getId(), booking.getPersons());
         bookingRepository.deleteById(bookingId);
     }
 
@@ -45,6 +46,7 @@ public class BookingService {
                                      String userId,
                                      String eventId) {
         Pageable paging = PageRequest.of(page, size);
+        // TODO: Not working as expected. Has to be fixed
         Page<Booking> pageBookings = bookingRepository.findBookings(userId, eventId, paging);
         return pageBookings;
     }
