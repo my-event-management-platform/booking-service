@@ -7,16 +7,23 @@ import com.eventmanagement.shared.exceptions.EventNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BookingService {
     public final BookingRepository bookingRepository;
     public final EventService eventService;
+    public final MongoTemplate mongoTemplate;
 
     @Transactional
     public void addBooking(Booking booking) {
@@ -46,10 +53,17 @@ public class BookingService {
                                      String userId,
                                      String eventId) {
         Pageable paging = PageRequest.of(page, size);
-        // TODO: Not working as expected. Has to be fixed
-        Page<Booking> pageBookings = bookingRepository.findBookings(userId, eventId, paging);
-        return pageBookings;
+        Query query = new Query();
+
+        if (!userId.isEmpty()) {
+            query.addCriteria(Criteria.where("userId").is(userId));
+        }
+        if (!eventId.isEmpty()) {
+            query.addCriteria(Criteria.where("event").is(eventId));
+        }
+
+        query.with(paging);
+        List<Booking> bookings = mongoTemplate.find(query, Booking.class);
+        return new PageImpl<>(bookings, paging, bookings.size());
     }
-
-
 }
